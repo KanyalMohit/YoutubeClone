@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/internal/models"
 	"backend/internal/services"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -40,10 +41,12 @@ func (h *VideoHandler) UploadVideo(c *gin.Context) {
 		return
 	}
 
-	uuidUserID, ok := userID.(uuid.UUID)
+	uuidUserID, err := uuid.Parse(userID.(string))
 
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID format"})
+	log.Println("User ID:", userID, "UUID User ID:", uuidUserID)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
 
@@ -136,4 +139,55 @@ func (h *VideoHandler) DeleteVideo(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 
+}
+
+func (h *VideoHandler) UpdateVideo(c *gin.Context) {
+	var req VideoUpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	videoID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid video ID"})
+		return
+	}
+
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	video, err := h.VideoService.GetVideoByID(videoID)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Video not found"})
+		return
+	}
+	if video.UserID != userID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You don't own this video"})
+		return
+	}
+
+	if req.TItle == "" && req.Description == "" && req.ThumbnailURL == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "At least one field must be provided"})
+		return
+	}
+	// Update only the fields that are provided
+	if req.TItle == "" {
+		req.TItle = video.Title
+	}
+	if req.Description == "" {
+		req.Description = video.Description
+	}
+	if req.ThumbnailURL == "" {
+		req.ThumbnailURL = video.ThumbnailURL
+	}
+
+	if err := h.VideoService.UpdateVideo(videoID, req.TItle, req.Description, req.ThumbnailURL); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update video"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Video updated successfully"})
 }

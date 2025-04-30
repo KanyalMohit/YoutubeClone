@@ -3,6 +3,7 @@ package main
 import (
 	"backend/internal/config"
 	"backend/internal/middleware"
+	"backend/internal/services"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -30,12 +31,13 @@ func main() {
 
 	baseRoute := "/api/v1"
 
+	authService := services.NewAuthService(cfg.JWTSecret)
 
 	// User routes
 	User(router.Group(baseRoute+"/user"), db, cfg.JWTSecret)
 
 	// Video routes
-	Video(router.Group(baseRoute+"/video"), db)
+	Video(router.Group(baseRoute+"/video"), db, middleware.AuthMiddleware(authService))
 
 	// Basic health check endpoint
 	router.GET(baseRoute+"/health", func(c *gin.Context) {
