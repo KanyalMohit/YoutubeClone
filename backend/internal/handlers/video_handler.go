@@ -22,7 +22,7 @@ func NewVideoHandler(videoService *services.VideoService) *VideoHandler {
 }
 
 type VideoUpdateRequest struct {
-	TItle        string `json:"title"`
+	Title        string `json:"title"`
 	Description  string `json:"description"`
 	ThumbnailURL string `json:"thumbnail_url"`
 }
@@ -119,6 +119,11 @@ func (h *VideoHandler) DeleteVideo(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
+	uuidUserID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
 
 	video, err := h.VideoService.GetVideoByID(videoID)
 
@@ -127,7 +132,7 @@ func (h *VideoHandler) DeleteVideo(c *gin.Context) {
 		return
 	}
 
-	if video.UserID != userID {
+	if video.UserID != uuidUserID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "you don't own this video"})
 		return
 	}
@@ -158,6 +163,11 @@ func (h *VideoHandler) UpdateVideo(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
+	uuidUserID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
 
 	video, err := h.VideoService.GetVideoByID(videoID)
 
@@ -165,18 +175,19 @@ func (h *VideoHandler) UpdateVideo(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Video not found"})
 		return
 	}
-	if video.UserID != userID {
+	//log.Println("Video UserID is ", video.UserID, "Provided Id is ", uuidUserID)
+	if video.UserID != uuidUserID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You don't own this video"})
 		return
 	}
 
-	if req.TItle == "" && req.Description == "" && req.ThumbnailURL == "" {
+	if req.Title == "" && req.Description == "" && req.ThumbnailURL == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "At least one field must be provided"})
 		return
 	}
 	// Update only the fields that are provided
-	if req.TItle == "" {
-		req.TItle = video.Title
+	if req.Title == "" {
+		req.Title = video.Title
 	}
 	if req.Description == "" {
 		req.Description = video.Description
@@ -185,7 +196,7 @@ func (h *VideoHandler) UpdateVideo(c *gin.Context) {
 		req.ThumbnailURL = video.ThumbnailURL
 	}
 
-	if err := h.VideoService.UpdateVideo(videoID, req.TItle, req.Description, req.ThumbnailURL); err != nil {
+	if err := h.VideoService.UpdateVideo(videoID, req.Title, req.Description, req.ThumbnailURL); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update video"})
 		return
 	}

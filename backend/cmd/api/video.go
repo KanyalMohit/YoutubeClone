@@ -23,5 +23,5 @@ func Video(router *gin.RouterGroup, db *sql.DB, authMiddleware gin.HandlerFunc) 
 
 	protected.POST("/upload", videoHandler.UploadVideo)
 	protected.DELETE("/:id", videoHandler.DeleteVideo)
-	
+	protected.PATCH("/:id", videoHandler.UpdateVideo)
 }
