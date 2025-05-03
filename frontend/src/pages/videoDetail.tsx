@@ -34,4 +34,4 @@ export default function VideoDetail() {
       {video.user && <p>Uploaded by: {video.user.username}</p>}
     </div>
   );
-}
+} 

@@ -1,42 +1,33 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../api/auth';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import '../App.css';
 
-export default function Signup() {
-  const [username, setUsername] = useState('');
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await registerUser({ username, email, password });
-      navigate('/login');
+      await login({ email, password });
+      const from = (location.state as any)?.from?.pathname || '/';
+      navigate(from);
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError('Login failed. Please check your credentials.');
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1 className="auth-title">Sign Up</h1>
+        <h1 className="auth-title">Login</h1>
         {error && <p className="error-message">{error}</p>}
         <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label className="form-label">Username:</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              className="form-input"
-              required
-            />
-          </div>
           <div className="form-group">
             <label className="form-label">Email:</label>
             <input
@@ -59,12 +50,12 @@ export default function Signup() {
               required
             />
           </div>
-          <button type="submit" className="auth-button">Sign Up</button>
+          <button type="submit" className="auth-button">Login</button>
         </form>
         <p className="auth-link">
-          Already have an account? <a href="/login">Login</a>
+          Don't have an account? <a href="/signup">Sign up</a>
         </p>
       </div>
     </div>
   );
-}
+} 
