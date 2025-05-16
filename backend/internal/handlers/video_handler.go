@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"backend/internal/models"
 	"backend/internal/services"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -28,12 +26,6 @@ type VideoUpdateRequest struct {
 }
 
 func (h *VideoHandler) UploadVideo(c *gin.Context) {
-	var req models.Video
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
 	userID, exists := c.Get("userID")
 
 	if !exists {
@@ -42,15 +34,36 @@ func (h *VideoHandler) UploadVideo(c *gin.Context) {
 	}
 
 	uuidUserID, err := uuid.Parse(userID.(string))
-
-	log.Println("User ID:", userID, "UUID User ID:", uuidUserID)
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
 
-	video, err := h.VideoService.UploadVideo(uuidUserID, req.Title, req.Description, req.VideoURL, req.ThumbnailURL)
+	err = c.Request.ParseMultipartForm(32 << 10) //32 MB limit
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse form data"})
+		return
+	}
+
+	title := c.Request.FormValue("title")
+	description := c.Request.FormValue("description")
+
+	file, header, err := c.Request.FormFile("video")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get video file"})
+		return
+	}
+
+	defer file.Close()
+
+	videoURL, err :=  h.VideoService.UploadVideoToCloudinary(file, header)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload video"})
+		return
+	}
+
+	video, err := h.VideoService.UploadVideo(uuidUserID, title, description, videoURL, "")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to upload video",

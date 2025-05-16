@@ -5,12 +5,19 @@ import (
 	"backend/internal/middleware"
 	"backend/internal/services"
 	"log"
+	"path/filepath"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env file from backend root directory
+	if err := godotenv.Load(filepath.Join("..", "..", ".env")); err != nil {
+		log.Fatal("Error loading .env file:", err)
+	}
+
 	// Load configuration
 	cfg := config.LoadConfig()
 
