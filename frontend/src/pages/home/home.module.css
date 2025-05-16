@@ -1,102 +1,133 @@
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--spacing-xl);
-  }
-  
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #0f0f0f;
+}
+
+.mainContent {
+  margin-left: 220px;
+  flex: 1;
+  padding: 56px 0 0 0;
+  background: #0f0f0f;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px 20px;
+  background: #0f0f0f;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 32px;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+}
+
+.filterButton {
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: #222;
+  border: 1px solid #333;
+  color: #aaa;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.filterButton:hover,
+.filterButton.active {
+  background-color: #c00;
+  color: white;
+  border-color: #c00;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #aaa;
+}
+
+.error {
+  color: #dc3545;
+  text-align: center;
+  padding: 32px;
+  background: #181818;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-xl);
-  }
-  
-  .title {
-    font-size: 1.75rem;
-    font-weight: 500;
-    color: var(--text-color);
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
   }
   
   .filters {
-    display: flex;
-    gap: var(--spacing-md);
-  }
-  
-  .filterButton {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-radius-sm);
-    background: white;
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: var(--transition-fast);
-  }
-  
-  .filterButton:hover,
-  .filterButton.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: var(--spacing-sm);
   }
   
   .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--spacing-lg);
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
   }
   
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-    color: var(--text-secondary);
+  .grid {
+    grid-template-columns: 1fr;
   }
-  
-  .error {
-    color: #dc3545;
-    text-align: center;
-    padding: var(--spacing-xl);
-    background: white;
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px 12px;
   }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .container {
-      padding: var(--spacing-md);
-    }
-    
-    .header {
-      flex-direction: column;
-      gap: var(--spacing-md);
-      align-items: flex-start;
-    }
-    
-    .filters {
-      width: 100%;
-      overflow-x: auto;
-      padding-bottom: var(--spacing-sm);
-    }
-    
-    .grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: var(--spacing-md);
-    }
+}
+
+@media (max-width: 800px) {
+  .mainContent {
+    margin-left: 0;
+    padding: 56px 0 0 0;
   }
-  
-  @media (max-width: 480px) {
-    .container {
-      padding: var(--spacing-sm);
-    }
-    
-    .title {
-      font-size: 1.5rem;
-    }
-    
-    .grid {
-      grid-template-columns: 1fr;
-    }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px 8px;
   }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px 0;
+  }
+}
   

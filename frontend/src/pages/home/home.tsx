@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Video } from "../../types/models";
 import { fetchVideos } from "../../api/videos";
 import VideoCard from "../../components/videoCard/videoCard";
+import Sidebar from "../../components/sidebar/Sidebar";
+import TopBar from "../../components/topbar/TopBar";
 import styles from "./home.module.css";
 
 export default function Home() {
@@ -43,35 +45,41 @@ export default function Home() {
   if (error) return <div className={styles.error}>{error}</div>;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Latest Videos</h1>
-        <div className={styles.filters}>
-          <button
-            className={`${styles.filterButton} ${filter === "all" ? styles.active : ""}`}
-            onClick={() => setFilter("all")}
-          >
-            All
-          </button>
-          <button
-            className={`${styles.filterButton} ${filter === "popular" ? styles.active : ""}`}
-            onClick={() => setFilter("popular")}
-          >
-            Popular
-          </button>
-          <button
-            className={`${styles.filterButton} ${filter === "recent" ? styles.active : ""}`}
-            onClick={() => setFilter("recent")}
-          >
-            Recent
-          </button>
-        </div>
+    <>
+      <TopBar />
+      <div className={styles.layout}>
+        <Sidebar />
+        <main className={styles.mainContent}>
+          <div className={styles.header}>
+            <h1 className={styles.title}>Latest Videos</h1>
+            <div className={styles.filters}>
+              <button
+                className={`${styles.filterButton} ${filter === "all" ? styles.active : ""}`}
+                onClick={() => setFilter("all")}
+              >
+                All
+              </button>
+              <button
+                className={`${styles.filterButton} ${filter === "popular" ? styles.active : ""}`}
+                onClick={() => setFilter("popular")}
+              >
+                Popular
+              </button>
+              <button
+                className={`${styles.filterButton} ${filter === "recent" ? styles.active : ""}`}
+                onClick={() => setFilter("recent")}
+              >
+                Recent
+              </button>
+            </div>
+          </div>
+          <div className={styles.grid}>
+            {filteredVideos.map(video => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+        </main>
       </div>
-      <div className={styles.grid}>
-        {filteredVideos.map(video => (
-          <VideoCard key={video.id} video={video} />
-        ))}
-      </div>
-    </div>
+    </>
   );
 }
